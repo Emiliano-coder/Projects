@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa del Tren Maya</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha384-xxxxxxx" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    
+    <style>
+        /* Estilos generales */
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #cfcece;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* Estilos del encabezado de navegación */
+        ul#navigation {
+            list-style-type: none;
+            margin: 0;
+            padding: 10px 0;
+            background-color: #1a5c51;
+            text-align: center;
+        }
+
+        ul#navigation li {
+            display: inline;
+            margin-right: 20px;
+        }
+
+        ul#navigation li a {
+            color: #fff;
+            text-decoration: none;
+            padding: 10px;
+            transition: opacity 0.3s;
+            border-radius: 5px;
+        }
+
+        ul#navigation li a:hover {
+            background-color: #1a5c51;
+        }
+
+        /* Estilos de secciones */
+        section {
+            padding: 40px;
+            text-align: center;
+        }
+
+        /* Estilos de botones */
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            border-radius: 25px; /* Botones más redondeados */
+            background-color: #1a5c51;
+            color: #fff;
+            text-decoration: none;
+            transition: background-color 0.3s;
+            margin: 10px;
+            border: 2px solid #185349; /* Añade un borde sólido */
+            cursor: pointer;
+            font-size: 16px;
+            text-align: center; /* Centra el texto */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra suave */
+        }
+
+        .button:hover {
+            background-color: #185349;
+            border-color: #000; /* Cambia el color del borde al pasar el mouse */
+        }
+
+        /* Estilos de selecciones de estaciones */
+        select {
+            padding: 9px;
+            border-radius: 5px;
+            border: 1px solid #1a5c51;
+            font-size: 16px;
+            margin-bottom: 10px;
+            width: 60%;
+            box-sizing: border-box; /* Ajusta el tamaño para incluir el borde */
+            background-color: #185349; 
+            border-color: #000;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            color: #fff;
+        }
+
+        /* Estilos para las opciones de las selecciones */
+        select option {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #fff; /* Fondo blanco */
+            color: #333; /* Texto oscuro */
+        }
+
+        /* Estilos de imágenes */
+        img {
+            max-width: auto;
+            height: auto;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Estilos de footer */
+        footer {
+            background-color: #1a5c51;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+            
+        }
+
+        footer p {
+            margin: 10px 0;
+        }
+
+        footer a {
+            color: #fff;
+            margin: 0 5px;
+        }
+
+        /* Estilos para el contenedor del mapa */
+        #mapContainer {
+            height: 500px; /* Establece la altura deseada */
+            margin-bottom: 40px; /* Espacio entre el mapa y el contenido siguiente */
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #map {
+            width: 100%;
+            height: 100%; /* Ocupa toda la altura disponible */
+            text-align: center;
+        }
+
+        /* Estilos específicos para la sección de inicio */
+        #inicio {
+            background-image: url('tren_maya.png'); /* Establece la imagen como fondo */
+            background-size: cover; /* Ajusta el tamaño de la imagen para cubrir todo el contenedor */
+            background-position: 55% -150px; /* Posiciona la imagen en la parte superior centrada */
+            color: #fff; /* Cambia el color del texto para que sea visible en la imagen */
+            padding-top: 120px; /* Añade espacio superior para evitar que el texto se superponga a la imagen */
+        }
+
+        #inicio h2 {
+            margin-bottom: 20px;
+        }
+
+        #inicio p {
+            margin-bottom: 20px;
+        }
+        #nosotros {
+    text-align: center; /* Centra el contenido horizontalmente */
+}
+
+    #nosotros h2 {
+        margin-bottom: 20px; /* Espacio inferior */
+}
+
+    #nosotros p {
+        margin-bottom: 20px; /* Espacio inferior */
+}
+
+    #nosotros ul {
+        list-style-type: none; /* Quita los puntos de la lista */
+        padding: 0; /* Quita el relleno predeterminado */
+}
+
+    #nosotros ul li {
+        font-size: 18px; /* Tamaño de fuente más grande */
+        margin-bottom: 10px; /* Espacio inferior entre elementos de la lista */
+}
+
+    #nosotros .button {
+        margin-top: 20px; /* Espacio superior para los botones */
+}
+
+    </style>
+</head>
+<body>
+    <!-- Encabezado de navegación -->
+    <ul id="navigation">
+        <li><a href="#inicio">Inicio</a></li>
+        <li><a href="#nosotros">Nosotros</a></li>
+        <li><a href="#ruta">Ruta</a></li>
+    </ul>
+
+    <!-- Sección "Inicio" -->
+    <section id="inicio">
+        <h2>¡Bienvenido al Mapa del Tren Maya!</h2>
+        <p>Somos el equipo 5 y presentamos nuestra aplicación web del Tren Maya. Incluye métodos de resolución como el Camino más corto (Dijkstra) y el Agente viajero.</p>
+        <a href="#ruta" class="button">Ver mapa de la ruta</a>
+        <a href="#nosotros" class="button">Conoce más sobre nosotros</a>
+    </section>
+
+    <!-- Sección "Nosotros" -->
+    <section id="nosotros">
+        <h2>Nosotros</h2>
+        <p>Nuestro equipo está compuesto por:</p>
+        <ul>
+            <li>Erick Maya Vázquez</li>
+            <li>Emiliano Olivos Beltrán</li>
+            <li>Yaneli Mujica</li>
+            <li>Marco Antonio Mota Herrera</li>
+        </ul>
+        <a href="#inicio" class="button">Ir al inicio</a>
+        <a href="#ruta" class="button">Ver mapa de la ruta</a>
+    </section>
+
+    <!-- Sección "Ruta" -->
+    <section id="ruta">
+        <h2>Ruta del Tren Maya</h2>
+        <!-- Contenedor del mapa -->
+        <div id="mapContainer">
+            <div id="map"></div>
+        </div>
+        <p>Selecciona la estación de inicio:</p>
+        <select id="startStation">
+            <option value="">Selecciona estación de inicio</option>
+            <!-- Las opciones se llenarán dinámicamente con JavaScript -->
+        </select>
+        <p>Selecciona la estación de destino:</p>
+        <select id="endStation">
+            <option value="">Selecciona estación de destino</option>
+            <!-- Las opciones se llenarán dinámicamente con JavaScript -->
+        </select>
+        <br>
+        <button id="travelingAgentBtn" class="button">Ejecutar Agente Viajero</button>
+
+        <button id="findRouteBtn" class="button">Trazar ruta</button>
+        <br>
+        <br>
+        <a href="#inicio" class="button">Ir al inicio</a>
+        <a href="#nosotros" class="button">Conoce más sobre nosotros</a>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>Síguenos en las redes sociales:</p>
+        <a href="F"><i class="fab fa-facebook-f"></i></a>
+        <a href="#"><i class="fab fa-twitter"></i></a>
+        <a href="#"><i class="fab fa-instagram"></i></a>
+        <p>Contacto: <a href="https://trenmayaa.com/ruta/" target="_blank">https://trenmayaa.com/ruta/</a></p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="opera.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-routing-machine/3.2.12/leaflet-routing-machine.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-control-geocoder/1.13.0/Control.Geocoder.min.js"></script>
+</body>
+</html>
